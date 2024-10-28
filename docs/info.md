@@ -13,7 +13,7 @@ This project implements 16 programmable digital LIF neurons with programmable de
 
 ## How to test
 
-After reset, program the neuron threshold, leak rate, and refractory period. Additionally program the first and second layer weights and delays. Once programmed activate spikes_in to represent input data, track spikes_out synchronously.
+After reset, program the neuron threshold, leak rate, and refractory period. Additionally program the first and second layer weights and delays. Once programmed activate spikes_in to represent input data, track spikes_out synchronously. 
 
 ## External hardware
 
