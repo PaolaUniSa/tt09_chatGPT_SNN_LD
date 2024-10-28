@@ -6,6 +6,24 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = project.v
+PROJECT_SOURCES += spiking_network_top.v
+PROJECT_SOURCES += clock_divider.v
+PROJECT_SOURCES += debug_module.v
+PROJECT_SOURCES += InputCurrentCalculator.v
+PROJECT_SOURCES += LeakyIntegrateFireNeuron_debug.v
+PROJECT_SOURCES += LIF_Neuron_debug.v
+PROJECT_SOURCES += memory.v
+PROJECT_SOURCES += neuron_delay.v
+PROJECT_SOURCES += NeuronLayerWithDelays_debug.v
+PROJECT_SOURCES += NeuronWithDelays_debug.v
+PROJECT_SOURCES += programmable_delay.v
+PROJECT_SOURCES += SNNwithDelays_top.v
+PROJECT_SOURCES += spi_control_unit.v
+PROJECT_SOURCES += spi_interface.v
+PROJECT_SOURCES += spi_slave.v
+PROJECT_SOURCES += synchronizer.v
+PROJECT_SOURCES += TwoLayerNetwork_debug.v
+PROJECT_SOURCES += reset_manager.v
 
 ifneq ($(GATES),yes)
 
