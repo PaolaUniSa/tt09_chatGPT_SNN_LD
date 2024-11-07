@@ -50,14 +50,14 @@ pinout:
   ui[7]: "input_spike[7]"
 
   # Outputs
-  uo[0]: "debug_output_0"
-  uo[1]: "debug_output_1"
-  uo[2]: "debug_output_2"
-  uo[3]: "debug_output_3"
-  uo[4]: "debug_output_4"
-  uo[5]: "debug_output_5"
-  uo[6]: "debug_output_6"
-  uo[7]: "debug_output_7"
+  uo[0]: "debug_output[0]"
+  uo[1]: "debug_output[1]"
+  uo[2]: "debug_output[2]"
+  uo[3]: "debug_output[3]"
+  uo[4]: "debug_output[4]"
+  uo[5]: "debug_output[5]"
+  uo[6]: "debug_output[6]"
+  uo[7]: "debug_output[7]"
 
   # Bidirectional pins
   uio[0]: "CS"
