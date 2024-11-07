@@ -40,14 +40,14 @@ project:
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "input_ready"
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  ui[0]: "input_spike[0]"
+  ui[1]: "input_spike[1]"
+  ui[2]: "input_spike[2]"
+  ui[3]: "input_spike[3]"
+  ui[4]: "input_spike[4]"
+  ui[5]: "input_spike[5]"
+  ui[6]: "input_spike[6]"
+  ui[7]: "input_spike[7]"
 
   # Outputs
   uo[0]: "debug_output_0"
@@ -64,9 +64,9 @@ pinout:
   uio[1]: "MOSI"
   uio[2]: "MISO"
   uio[3]: "SCLK"
-  uio[4]: "output_spikes_0"
-  uio[5]: "output_spikes_1"
-  uio[6]: "data_valid_out"
+  uio[4]: "input_ready"
+  uio[5]: "output_ready"
+  uio[6]: "SNN_en"
   uio[7]: "spi_instruction_done"
 
 # Do not change!
