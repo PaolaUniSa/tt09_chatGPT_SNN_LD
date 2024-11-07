@@ -38,6 +38,6 @@ end
 assign sync_dout = sync_reg2;
 
 // Mux to select between din and the synchronized delayed output
-assign dout = (delay == 1'b0) ? din : sync_dout;
+assign dout = (delay == 1'b1) ? sync_dout: din;
 
 endmodule

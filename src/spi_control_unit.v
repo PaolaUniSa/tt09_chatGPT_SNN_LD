@@ -10,8 +10,6 @@ module spi_control_unit (
     output reg SPI_instruction_reg_en,   // Enable signal for Instruction register
     output reg clk_div_ready,
     output reg clk_div_ready_en,
-    output reg input_spike_ready,
-    output reg input_spike_ready_en,
     output reg debug_config_ready,
     output reg debug_config_ready_en,
     output reg write_memory_enable,
@@ -60,7 +58,7 @@ module spi_control_unit (
             WAIT_DATA_VALID_FINAL: begin
                 if (data_valid) begin
                     case (SPI_instruction_reg_out)
-                        8'h05, 8'h07, 8'h09: next_state = SYSCLK_DOMAIN_EN;
+                        8'h05, 8'h09: next_state = SYSCLK_DOMAIN_EN;
                         default: next_state = IDLE;
                     endcase
                 end
@@ -80,8 +78,6 @@ module spi_control_unit (
             SPI_instruction_reg_en <= 0;
             clk_div_ready <= 0;
             clk_div_ready_en <= 0;
-            input_spike_ready <= 0;
-            input_spike_ready_en <= 0;
             debug_config_ready <= 0;
             debug_config_ready_en <= 0;
             write_memory_enable <= 0;
@@ -92,8 +88,6 @@ module spi_control_unit (
             SPI_instruction_reg_en <= 0;
             clk_div_ready <= 0;
             clk_div_ready_en <= 0;
-            input_spike_ready <= 0;
-            input_spike_ready_en <= 0;
             debug_config_ready <= 0;
             debug_config_ready_en <= 0;
             write_memory_enable <= 0;
@@ -115,7 +109,6 @@ module spi_control_unit (
                         SPI_instruction_reg_en <= 1;
                         case (SPI_instruction_reg_in)
                             8'h05: clk_div_ready_en <= 1;
-                            8'h07: input_spike_ready_en <= 1;
                             8'h09: debug_config_ready_en <= 1;
                         default: ;
                         endcase
@@ -129,7 +122,7 @@ module spi_control_unit (
                                 write_memory_enable <= 1;
                                 spi_instruction_done <= 1;
                             end
-                            8'h05, 8'h07, 8'h09:  write_memory_enable <= 1;
+                            8'h05, 8'h09:  write_memory_enable <= 1;
                         default:
                             spi_instruction_done <= 1; // Indicate completion before returning to idle - Assert when instruction cycle completes;
                         endcase
@@ -141,10 +134,6 @@ module spi_control_unit (
                         8'h05: begin
                             clk_div_ready <= 1;
                             clk_div_ready_en <= 1;
-                        end
-                        8'h07: begin
-                            input_spike_ready <= 1;
-                            input_spike_ready_en <= 1;
                         end
                         8'h09: begin
                             debug_config_ready <= 1;

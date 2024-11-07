@@ -1,44 +1,66 @@
 module InputCurrentCalculator #(
     parameter M = 4  // Number of input spikes and weights
 )(
-    input wire clk,                       // Clock signal
-    input wire reset,                     // Asynchronous reset, active high
-    input wire enable,                    // Enable input for calculation
     input wire [M-1:0] input_spikes,      // M-bit input spikes
-    input wire [M*2-1:0] weights,         // M x 2bit-weights = M x (zero,sign)
-    output reg [6-1:0] input_current        // 6bit-input current  -- with M<32 there is no overflow-underflow
+    input wire [M*2-1:0] weights,         // M x 2bit-weights
+    output wire [4:0] input_current       // 5-bit input current, M < 15 ensures no overflow/underflow
 );
-    integer i;
-    
-    reg signed [6-1:0] current_sum;
 
-    // Combinational logic for current sum
-    always @(*) begin
-        current_sum = 0;  // Initialize current sum to zero
-        for (i = 0; i < M; i = i + 1) begin
-            if ((input_spikes[i] & (~weights[2*i])) == 1'b1) begin
-                if (weights[2*i+1] == 1'b1) begin
-                    current_sum = current_sum - 1;
-                end else begin
-                    current_sum = current_sum + 1;
-                end
-            end
-        end
-    end
+    wire signed [4:0] weighted_sum [0:M-1]; // Array of intermediate weighted sums
+    wire signed [4:0] partial_sum [0:M];    // Array to accumulate sums
 
-    // Register update for input_current
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            input_current <= 6'b0;
-        end else if (enable) begin
-            // Handle overflow
-            if (current_sum > 31) begin
-                input_current <= 6'b011111;  // Clamp to 31
-            end else if (current_sum < -32) begin
-                input_current <= 6'b100000;  // Clamp to -32
-            end else begin
-                input_current <= current_sum[6-1:0];
-            end
+    // Initialize weighted sums based on input spikes and weights
+    genvar i;
+    generate
+        for (i = 0; i < M; i = i + 1) begin : weighted_sum_loop
+            assign weighted_sum[i] = input_spikes[i] ? $signed(weights[i*2 +: 2]) : 5'd0;
         end
-    end
+    endgenerate
+
+    // Sum all weighted values combinationally
+    assign partial_sum[0] = 5'd0; // Initialize the first partial sum to zero
+    generate
+        for (i = 0; i < M; i = i + 1) begin : sum_loop
+            assign partial_sum[i+1] = partial_sum[i] + weighted_sum[i];
+        end
+    endgenerate
+
+    // The final output is the last element in the partial_sum array
+    assign input_current = partial_sum[M];
+
 endmodule
+
+
+
+//module InputCurrentCalculator #(
+//    parameter M = 4  // Number of input spikes and weights
+//)(
+//    input wire clk,                       // Clock signal
+//    input wire reset,                     // Asynchronous reset, active high
+//    input wire enable,                    // Enable input for calculation
+//    input wire [M-1:0] input_spikes,      // M-bit input spikes
+//    input wire [M*2-1:0] weights,         // M x 2bit-weights
+//    output reg [5-1:0] input_current        // 5bit-input current  -- with M<15 there is no overflow-underflow
+//);
+
+//    integer i;
+//    reg signed [5-1:0] current_sum;       // Accumulator for the weighted sum
+
+//    always @(posedge clk or posedge reset) begin
+//        if (reset) begin
+//            input_current <= 5'd0;        // Reset input_current to zero
+//        end else if (enable) begin
+//            current_sum = 5'd0;           // Reset the accumulator at the beginning of each calculation
+
+//            // Loop through each spike and add the corresponding weight if spike is 1
+//            for (i = 0; i < M; i = i + 1) begin
+//                if (input_spikes[i] == 1'b1) begin
+//                    current_sum = current_sum + $signed(weights[i*2 +: 2]); // Add 2-bit weight corresponding to spike
+//                end
+//            end
+
+//            input_current <= current_sum; // Update the output with the computed sum
+//        end
+//    end
+
+//endmodule

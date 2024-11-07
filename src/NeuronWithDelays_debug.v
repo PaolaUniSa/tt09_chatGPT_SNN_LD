@@ -1,5 +1,5 @@
 module NeuronWithDelays_debug #( //weight bit-length=2bits=(zero,sign) // membrane potential bit-length=6 bits
-    parameter M = 2                // Number of input spikes and weights
+    parameter M = 8                // Number of input spikes and weights
 )(
     input wire clk,                      // Clock signal
     input wire reset,                    // Asynchronous reset, active high
@@ -7,12 +7,12 @@ module NeuronWithDelays_debug #( //weight bit-length=2bits=(zero,sign) // membra
     input wire delay_clk,                // Delay Clock signal
     input wire [M-1:0] input_spikes,     // M-bit input spikes
     input wire [M*2-1:0] weights,        // M Nbit weights
-    input wire [6-1:0] threshold,          // Firing threshold (V_thresh)
-    input wire [6-1:0] decay,              // Decay value
-    input wire [6-1:0] refractory_period,  // Refractory period in number of clock cycles
+    input wire [5-1:0] threshold,          // Firing threshold (V_thresh)
+    input wire [3-1:0] decay,              // Decay value
+    input wire [5-1:0] refractory_period,  // Refractory period in number of clock cycles
     input wire [M*3-1:0] delay_values,   // Flattened array of 3-bit delay values
     input wire [M-1:0] delays,           // Array of delay enables for each input
-    output wire [6-1:0] membrane_potential_out, // add for debug
+    output wire [5-1:0] membrane_potential_out, // add for debug
     output wire spike_out                // Output spike signal
 );
     wire [M-1:0] delayed_spikes;     // Delayed input spikes

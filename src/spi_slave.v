@@ -41,25 +41,6 @@ module spi_slave (
         end
     end
 
-//    // MISO control and bit counter process
-//    always @(negedge SCLK or posedge RESET or posedge SS) begin
-//        if (RESET || SS) begin
-//            // When RESET is high, reset MISO and bit counter
-//            MISO <= 1'b0;
-//            bit_cnt <= 3'b000;
-//        end else begin
-//            // Shift out data on the falling edge of SCLK
-//            if (SS) begin
-//                MISO <= 1'b0;
-//                bit_cnt <= 3'b000;
-//            end else begin
-//                MISO <= data_to_send[7 - bit_cnt];
-//                bit_cnt <= bit_cnt + 1;
-//            end
-//        end
-//    end
-
-
     // MISO control and bit counter process
     always @(negedge SCLK or posedge RESET) begin //always @(negedge SCLK or posedge RESET or posedge SS) begin modified 10Sep2024
         if (RESET) begin

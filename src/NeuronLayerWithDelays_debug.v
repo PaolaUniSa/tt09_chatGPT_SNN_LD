@@ -8,12 +8,12 @@ module NeuronLayerWithDelays_debug #( //weight bit-length=2bits=(zero,sign) // m
     input wire delay_clk,                // Delay Clock signal
     input wire [M-1:0] input_spikes,     // M-bit input spikes
     input wire [N*M*2-1:0] weights,      // N * M Nbit weights
-    input wire [6-1:0] threshold,          // Firing threshold (V_thresh)
-    input wire [6-1:0] decay,              // Decay value
-    input wire [6-1:0] refractory_period,  // Refractory period in number of clock cycles
+    input wire [5-1:0] threshold,          // Firing threshold (V_thresh)
+    input wire [3-1:0] decay,              // Decay value
+    input wire [5-1:0] refractory_period,  // Refractory period in number of clock cycles
     input wire [N*M*3-1:0] delay_values, // Flattened array of 3-bit delay values
     input wire [N*M-1:0] delays,         // Array of delay enables for each input
-    output wire [N*6-1:0] membrane_potential_out, // add for debug
+    output wire [N*5-1:0] membrane_potential_out, // add for debug
     output wire [N-1:0] output_spikes    // Output spike signals for each neuron 
 );
 
@@ -35,7 +35,7 @@ module NeuronLayerWithDelays_debug #( //weight bit-length=2bits=(zero,sign) // m
                 .refractory_period(refractory_period),
                 .delay_values(delay_values[i*M*3 +: M*3]),
                 .delays(delays[i*M +: M]),
-                .membrane_potential_out(membrane_potential_out[i*6 +: 6]),
+                .membrane_potential_out(membrane_potential_out[i*5 +: 5]),
                 .spike_out(output_spikes[i])
             );
         end

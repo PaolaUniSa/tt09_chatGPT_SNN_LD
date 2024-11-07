@@ -1,20 +1,20 @@
 module memory //#(parameter M = 66, parameter N = 8)
 (
     input wire [7:0] data_in,//[N-1:0] data_in,
-    input wire [7:0] addr,//[$clog2(M)-1:0] addr,
+    input wire [6:0] addr,//[$clog2(M)-1:0] addr,
     input wire write_enable,
     input wire clk,
     input wire reset,
     output reg [7:0] data_out,//[N-1:0] data_out,
-    output reg [102*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
+    output reg [101*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
 );
 
-    // Declare the memory array
-    reg [7:0] mem [0:163];//mem [0:102-1];
+    // Declare the memory array 
+    reg [7:0] mem [0:101-1];//mem [0:102-1];
     integer j;
     
-    reg [7:0] addr_reg_out;
-    wire [7:0] addr_reg_in;
+    reg [6:0] addr_reg_out;
+    wire [6:0] addr_reg_in;
     
     assign addr_reg_in = addr;
 
@@ -126,7 +126,7 @@ module memory //#(parameter M = 66, parameter N = 8)
             mem[98] <= 0;
             mem[99] <= 0;
             mem[100] <= 0;
-            mem[101] <= 0;
+           // mem[101] <= 0;
 
         end else if (write_enable) begin
             mem[addr_reg_in] <= data_in;  // Write data to memory
@@ -139,7 +139,7 @@ module memory //#(parameter M = 66, parameter N = 8)
         data_out = mem[addr_reg_out];
 
         // Concatenate all memory data into all_data_out
-        for (j = 0; j < 102; j = j + 1) begin
+        for (j = 0; j < 101; j = j + 1) begin
             all_data_out[j*8 +: 8] = mem[j];
         end
     end
