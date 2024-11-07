@@ -11,8 +11,8 @@ module LeakyIntegrateFireNeuron_debug
     output reg spike_out                        // Output spike signal, renamed from 'fired'
 );
 
-    reg [5-1:0] membrane_potential = 6'b0;  // Membrane potential (V_m), initialized to 0
-    reg [5-1:0] refractory_counter = 6'b0;  // Counter to handle the refractory period, initialized to 0
+    reg [5-1:0] membrane_potential = 5'b0;  // Membrane potential (V_m), initialized to 0
+    reg [5-1:0] refractory_counter = 5'b0;  // Counter to handle the refractory period, initialized to 0
     wire signed [5+1:0] potential_update;   // Use a wire for immediate calculation
     
     wire signed [5+1:0] Vdecay;
