@@ -6,39 +6,30 @@ module InputCurrentCalculator //M=8
 );
 
     // Array of weighted sums, using 3 bits initially since weights are 2 bits
-    wire signed [2:0] weighted_sum [0:7]; 
+    wire signed [4:0] weighted_sum [0:7]; 
 
-    // Intermediate sums for the adder tree
-    wire signed [2:0] level1_sum [0:3];  // 3-bit adders for first level
-    wire signed [3:0] level2_sum [0:1];  // 4-bit adders for second level
-    wire signed [4:0] final_sum;         // 5-bit adder for final sum
-
+    wire signed [4:0] partial_sum [0:8];    // Array to accumulate sums
+    
     // Generate weighted sums based on input spikes and weights, with sign extension
     genvar i;
     generate
         for (i = 0; i < 8; i = i + 1) begin : weighted_sum_loop
             // Concatenate the most significant bit (sign bit) to create a 3-bit signed value
-            assign weighted_sum[i] = input_spikes[i] ? $signed({weights[i*2 + 1], weights[i*2 +: 2]}) : $signed(3'd0);
+            assign weighted_sum[i] = input_spikes[i] ? $signed({{3{weights[i*2 + 1]}}, weights[i*2 +: 2]}) : $signed(3'd0);
         end
     endgenerate
-
-    // First level of the adder tree (3-bit adders), using generate for cleaner code
+    
+    // Sum all weighted values combinationally
+    assign partial_sum[0] = 5'd0; // Initialize the first partial sum to zero
     generate
-        for (i = 0; i < 4; i = i + 1) begin : level1_sum_loop
-            assign level1_sum[i] = weighted_sum[2*i] + weighted_sum[2*i + 1];
+        for (i = 0; i < 8; i = i + 1) begin : sum_loop
+            assign partial_sum[i+1] = partial_sum[i] + weighted_sum[i];
         end
     endgenerate
 
-    // Second level of the adder tree (4-bit adders) with sign extension
-    assign level2_sum[0] = $signed({level1_sum[0][2], level1_sum[0]}) + $signed({level1_sum[1][2], level1_sum[1]});
-    assign level2_sum[1] = $signed({level1_sum[2][2], level1_sum[2]}) + $signed({level1_sum[3][2], level1_sum[3]});
-
-    // Final level of the adder tree (5-bit adder) with sign extension
-    assign final_sum = $signed({level2_sum[0][3], level2_sum[0]}) + $signed({level2_sum[1][3], level2_sum[1]});
-
-    // Assign final output
-    assign input_current = final_sum;
-
+    // The final output is the last element in the partial_sum array
+    assign input_current = partial_sum[8];
+    
 endmodule
 
 
