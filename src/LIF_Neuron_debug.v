@@ -8,12 +8,15 @@ module LIF_Neuron_debug (
     input wire [3-1:0] decay,                // Decay value
     input wire [5-1:0] refractory_period,    // Refractory period in number of clock cycles
     output wire [5-1:0] membrane_potential_out, // add for debug
-    output wire spike_out                   // Output spike signal
+    output wire spike_out                  // Output spike signal
 );
     wire [5-1:0] input_current;         // Nbit input current from InputCurrentCalculator
 
     // Instantiate the InputCurrentCalculator module
     InputCurrentCalculator input_current_calculator_inst (
+        //.clk(clk),
+        //.reset(reset),
+        //.enable(enable),
         .input_spikes(input_spikes),
         .weights(weights),
         .input_current(input_current)

@@ -5,13 +5,14 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
     input wire enable,                     // Enable input for the entire network
     input wire delay_clk,                  // Delay Clock signal
     input wire [8-1:0] input_spikes,        // M1-bit input spikes for the first layer
-    input wire [(8*8+8*8)*2-1:0] weights,           // Combined weights for both layers (N1*M1*8 + N2*N1*8 bits)
+    input wire [(8*8+8*8+8*8)*2-1:0] weights,           // Combined weights for both layers (N1*M1*8 + N2*N1*8 bits)
     input wire [5-1:0] threshold,            // Firing threshold for both layers
     input wire [3-1:0] decay,                // Decay value for both layers
     input wire [5-1:0] refractory_period,    // Refractory period for both layers
-    input wire [(8*8+8*8)*4-1:0] delays,     //320        // Combined delay values and delays for both layers (8*8*4 + 8*8*4 bits)
-    output wire [(8+8)*5-1:0] membrane_potential_out, // (8+8)*6 bits
+    input wire [(8*8+8*8+8*8)*4-1:0] delays,     //320        // Combined delay values and delays for both layers (8*8*4 + 8*8*4 bits)
+    output wire [(8+8+8)*5-1:0] membrane_potential_out, // (8+8)*6 bits
     output wire [7:0] output_spikes_layer1,    // Output spike signals for the first layer
+    output wire [7:0] output_spikes_layer2,    // Output spike signals for the first layer
     output wire [8-1:0] output_spikes,           // Output spike signals for the second layer
     output wire output_data_ready
 );
@@ -21,6 +22,9 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
     wire [8*8-1:0] delays1; //8*8=64
     wire [8*8*3-1:0] delay_values2;//8*2*3=48
     wire [8*8-1:0] delays2;//8*2
+    wire [8*8*3-1:0] delay_values3;//8*2*3=48
+    wire [8*8-1:0] delays3;//8*2
+    
     
     genvar i;
     generate
@@ -36,11 +40,16 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
             assign delays2[i-64] = delays[i*4 + 3];
         end
     endgenerate
+    
+    generate  
+        for (i = 128; i < 192; i = i + 1) begin : unpack_delays3
+            assign delay_values3[(i-128)*3 +: 3] = delays[i*4 +: 3];
+            assign delays3[i-128] = delays[i*4 + 3];
+        end
+    endgenerate
+    
 
-    TwoLayerNetwork_debug #(
-        .N1(8), 
-        .N2(8)
-    ) two_layer_network_inst (
+    TwoLayerNetwork_debug two_layer_network_inst (
         .clk(clk),
         .reset(reset),
         .enable(enable),
@@ -48,18 +57,25 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
         .input_spikes(input_spikes),
         .weights1(weights[8*8*2-1:0]),         // weights1 part of the combined weights array
         .weights2(weights[8*8*2+8*8*2-1:8*8*2]),       // weights2 part of the combined weights array
+        .weights3(weights[8*8*2+8*8*2+8*8*2-1:8*8*2+8*8*2]),
         .threshold1(threshold),
         .decay1(decay),
         .refractory_period1(refractory_period),
         .threshold2(threshold),
         .decay2(decay),
+        .threshold3(threshold),
+        .decay3(decay),
         .refractory_period2(refractory_period),
+        .refractory_period3(refractory_period),
         .delay_values1(delay_values1),
         .delays1(delays1),
         .delay_values2(delay_values2),
         .delays2(delays2),
+        .delay_values3(delay_values3),
+        .delays3(delays3),
         .membrane_potential_out(membrane_potential_out),
         .output_spikes_layer1(output_spikes_layer1),
+        .output_spikes_layer2(output_spikes_layer2),
         .output_spikes(output_spikes),
         .output_data_ready(output_data_ready)
     );

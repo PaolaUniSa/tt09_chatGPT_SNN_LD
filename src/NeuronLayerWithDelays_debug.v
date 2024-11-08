@@ -1,5 +1,4 @@
-module NeuronLayerWithDelays_debug #( //weight bit-length=2bits=(zero,sign) // membrane potential bit-length=6 bits
-    //parameter M = 2,                // Number of input spikes and weights
+module NeuronLayerWithDelays_debug #( //weight =2bits
     parameter N = 4                 // Number of neurons in the layer
 )(
     input wire clk,                      // Clock signal

@@ -17,6 +17,7 @@ module LeakyIntegrateFireNeuron_debug
     
     wire signed [5+1:0] Vdecay;
     
+                    
     // Assign Vdecay based on decay value
     assign Vdecay = 
                     (decay == 1) ? $signed({membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1:1]}) :

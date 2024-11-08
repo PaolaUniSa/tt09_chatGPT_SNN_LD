@@ -1,27 +1,27 @@
-module memory //#(parameter M = 66, parameter N = 8)
+module memory
 (
     input wire [7:0] data_in,//[N-1:0] data_in,
-    input wire [6:0] addr,//[$clog2(M)-1:0] addr,
+    input wire [7:0] addr,//[$clog2(M)-1:0] addr,
     input wire write_enable,
     input wire clk,
     input wire reset,
     output reg [7:0] data_out,//[N-1:0] data_out,
-    output reg [101*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
+    output reg [149*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
 );
 
     // Declare the memory array 
-    reg [7:0] mem [0:101-1];//mem [0:102-1];
+    reg [7:0] mem [0:149-1];
     integer j;
     
-    reg [6:0] addr_reg_out;
-    wire [6:0] addr_reg_in;
+    reg [7:0] addr_reg_out;
+    wire [7:0] addr_reg_in;
     
     assign addr_reg_in = addr;
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             // Asynchronous reset: clear all memory contents
-//            for (i = 0; i < 66; i = i + 1) begin
+//            for (i = 0; i < 149; i = i + 1) begin
 //                mem[i] <= 0; 
 //            end
             addr_reg_out <= 0;
@@ -126,8 +126,55 @@ module memory //#(parameter M = 66, parameter N = 8)
             mem[98] <= 0;
             mem[99] <= 0;
             mem[100] <= 0;
-           // mem[101] <= 0;
-
+            mem[101] <= 0;
+            mem[102] <= 0;
+            mem[103] <= 0;
+            mem[104] <= 0;
+            mem[105] <= 0;
+            mem[106] <= 0;
+            mem[107] <= 0;
+            mem[108] <= 0;
+            mem[109] <= 0;
+            mem[110] <= 0;
+            mem[111] <= 0;
+            mem[112] <= 0;
+            mem[113] <= 0;
+            mem[114] <= 0;
+            mem[115] <= 0;
+            mem[116] <= 0;
+            mem[117] <= 0;
+            mem[118] <= 0;
+            mem[119] <= 0;
+            mem[120] <= 0;
+            mem[121] <= 0;
+            mem[122] <= 0;
+            mem[123] <= 0;
+            mem[124] <= 0;
+            mem[125] <= 0;
+            mem[126] <= 0;
+            mem[127] <= 0;
+            mem[128] <= 0;
+            mem[129] <= 0;
+            mem[130] <= 0;
+            mem[131] <= 0;
+            mem[132] <= 0;
+            mem[133] <= 0;
+            mem[134] <= 0;
+            mem[135] <= 0;
+            mem[136] <= 0;
+            mem[137] <= 0;
+            mem[138] <= 0;
+            mem[139] <= 0;
+            mem[140] <= 0;
+            mem[141] <= 0;
+            mem[142] <= 0;
+            mem[143] <= 0;
+            mem[144] <= 0;
+            mem[145] <= 0;
+            mem[146] <= 0;
+            mem[147] <= 0;
+            mem[148] <= 0;
+            
         end else if (write_enable) begin
             mem[addr_reg_in] <= data_in;  // Write data to memory
             addr_reg_out <= addr_reg_in;
@@ -139,53 +186,9 @@ module memory //#(parameter M = 66, parameter N = 8)
         data_out = mem[addr_reg_out];
 
         // Concatenate all memory data into all_data_out
-        for (j = 0; j < 101; j = j + 1) begin
+        for (j = 0; j < 149; j = j + 1) begin
             all_data_out[j*8 +: 8] = mem[j];
         end
     end
     
-    
-    
-    
-
 endmodule
-
-
-//module memory #(parameter M = 164, parameter N = 8) (
-//    input wire [N-1:0] data_in,
-//    input wire [$clog2(M)-1:0] addr,
-//    input wire write_enable,
-//    input wire clk,
-//    input wire reset,
-//    output reg [N-1:0] data_out,
-//    output reg [M*N-1:0] all_data_out
-//);
-
-//    // Declare the memory array
-//    reg [N-1:0] mem [0:M-1];
-//    integer i,j;
-
-//    always @(posedge clk or posedge reset) begin
-//        if (reset) begin
-//            // Asynchronous reset: clear all memory contents
-//            for (i = 0; i < M; i = i + 1) begin
-//                mem[i] <= 0; 
-//            end
-////            mem[0] <= 0; 
-////            mem[1] <= 0; 
-//        end else if (write_enable) begin
-//            mem[addr] <= data_in;  // Write data to memory
-//        end
-//    end
-
-//    always @(*) begin
-//        // Output the data at the current address
-//        data_out = mem[addr];
-
-//        // Concatenate all memory data into all_data_out
-//        for (j = 0; j < M; j = j + 1) begin
-//            all_data_out[j*N +: N] = mem[j];
-//        end
-//    end
-
-//endmodule
