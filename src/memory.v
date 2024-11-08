@@ -6,11 +6,11 @@ module memory
     input wire clk,
     input wire reset,
     output reg [7:0] data_out,//[N-1:0] data_out,
-    output reg [125*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
+    output reg [113*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
 );
 
     // Declare the memory array 
-    reg [7:0] mem [0:125-1];
+    reg [7:0] mem [0:113-1];
     integer j;
     
     reg [6:0] addr_reg_out;
@@ -138,18 +138,18 @@ module memory
             mem[110] <= 0;
             mem[111] <= 0;
             mem[112] <= 0;
-            mem[113] <= 0;
-            mem[114] <= 0;
-            mem[115] <= 0;
-            mem[116] <= 0;
-            mem[117] <= 0;
-            mem[118] <= 0;
-            mem[119] <= 0;
-            mem[120] <= 0;
-            mem[121] <= 0;
-            mem[122] <= 0;
-            mem[123] <= 0;
-            mem[124] <= 0;
+//            mem[113] <= 0;
+//            mem[114] <= 0;
+//            mem[115] <= 0;
+//            mem[116] <= 0;
+//            mem[117] <= 0;
+//            mem[118] <= 0;
+//            mem[119] <= 0;
+//            mem[120] <= 0;
+//            mem[121] <= 0;
+//            mem[122] <= 0;
+//            mem[123] <= 0;
+//            mem[124] <= 0;
 //            mem[125] <= 0;
 //            mem[126] <= 0;
 //            mem[127] <= 0;
@@ -186,7 +186,7 @@ module memory
         data_out = mem[addr_reg_out];
 
         // Concatenate all memory data into all_data_out
-        for (j = 0; j < 125; j = j + 1) begin
+        for (j = 0; j < 113; j = j + 1) begin
             all_data_out[j*8 +: 8] = mem[j];
         end
     end
