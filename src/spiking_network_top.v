@@ -6,7 +6,7 @@ module spiking_network_top
     input wire MOSI,
     input wire SS,
     input wire input_ready,
-    input wire SNN_en,
+    input wire SNN_en, 
     input wire [8-1:0] input_spikes,
     output wire MISO,
     output wire [8-1:0] debug_output,//[7:0]
