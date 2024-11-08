@@ -1,5 +1,5 @@
 module TwoLayerNetwork_debug #( //weight bit-length=2bits=(zero,sign) // membrane potential bit-length=6 bits
-    parameter M1 = 8,                // Number of input spikes for the first layer
+    //parameter M1 = 8,                // Number of input spikes for the first layer
     parameter N1 = 8,                 // Number of neurons in the first layer
     parameter N2 = 8                 // Number of neurons in the second layer 
 )(
@@ -7,8 +7,8 @@ module TwoLayerNetwork_debug #( //weight bit-length=2bits=(zero,sign) // membran
     input wire reset,                      // Asynchronous reset, active high
     input wire enable,                     // Enable input for the entire network
     input wire delay_clk,                  // Delay Clock signal
-    input wire [M1-1:0] input_spikes,      // M1-bit input spikes for the first layer
-    input wire [N1*M1*2-1:0] weights1,     // N1 * M1 Nbit weights for the first layer
+    input wire [8-1:0] input_spikes,      // M1-bit input spikes for the first layer
+    input wire [N1*8*2-1:0] weights1,     // N1 * M1 Nbit weights for the first layer
     input wire [N2*N1*2-1:0] weights2,     // N2 * N1 Nbit weights for the second layer
     input wire [5-1:0] threshold1,           // Firing threshold for the first layer
     input wire [3-1:0] decay1,               // Decay value for the first layer
@@ -16,8 +16,8 @@ module TwoLayerNetwork_debug #( //weight bit-length=2bits=(zero,sign) // membran
     input wire [5-1:0] threshold2,           // Firing threshold for the second layer
     input wire [3-1:0] decay2,               // Decay value for the second layer
     input wire [5-1:0] refractory_period2,   // Refractory period for the second layer
-    input wire [N1*M1*3-1:0] delay_values1,// Delay values for the first layer
-    input wire [N1*M1-1:0] delays1,        // Delays for the first layer
+    input wire [N1*8*3-1:0] delay_values1,// Delay values for the first layer
+    input wire [N1*8-1:0] delays1,        // Delays for the first layer
     input wire [N2*N1*3-1:0] delay_values2,// Delay values for the second layer
     input wire [N2*N1-1:0] delays2,        // Delays for the second layer
     output wire [(N1+N2)*5-1:0] membrane_potential_out, // add for debug
@@ -32,7 +32,7 @@ module TwoLayerNetwork_debug #( //weight bit-length=2bits=(zero,sign) // membran
     
     // First layer
     NeuronLayerWithDelays_debug #(
-        .M(M1),
+        //.M(M1),
         .N(N1)
     ) layer1 (
         .clk(clk),
@@ -63,7 +63,7 @@ module TwoLayerNetwork_debug #( //weight bit-length=2bits=(zero,sign) // membran
     
     // Second layer
     NeuronLayerWithDelays_debug #(
-        .M(N1),
+        //.M(N1),
         .N(N2)
     ) layer2 (
         .clk(clk),
