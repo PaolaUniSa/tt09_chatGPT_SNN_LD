@@ -23,7 +23,7 @@ module LeakyIntegrateFireNeuron_debug
                     (decay == 2) ? $signed({membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1:2]}) :
                     (decay == 3) ? $signed({membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1:3]}) :
                     (decay == 4) ? $signed({membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[5-1], membrane_potential[4]}) :
-                    $signed(0); // Default to signed 0
+                    $signed(7'b0); // Default to signed 0
 
     assign membrane_potential_out = membrane_potential;
     
