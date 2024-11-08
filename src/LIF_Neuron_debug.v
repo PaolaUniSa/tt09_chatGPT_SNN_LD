@@ -1,12 +1,9 @@
-module LIF_Neuron_debug #(
-    parameter M = 8                // Number of input spikes and weights
-    //weight bit-length=2bits=(zero,sign) // membrane potential bit-length=6 bits
-)(
+module LIF_Neuron_debug (
     input wire clk,                        // Clock signal
     input wire reset,                      // Asynchronous reset, active high
     input wire enable,                     // Enable input for the entire LIF neuron
-    input wire [M-1:0] input_spikes,       // M-bit input spikes
-    input wire [M*2-1:0] weights,          // M Nbit weights
+    input wire [8-1:0] input_spikes,       // M-bit input spikes
+    input wire [8*2-1:0] weights,          // M Nbit weights
     input wire [5-1:0] threshold,            // Firing threshold (V_thresh)
     input wire [3-1:0] decay,                // Decay value
     input wire [5-1:0] refractory_period,    // Refractory period in number of clock cycles
@@ -16,12 +13,7 @@ module LIF_Neuron_debug #(
     wire [5-1:0] input_current;         // Nbit input current from InputCurrentCalculator
 
     // Instantiate the InputCurrentCalculator module
-    InputCurrentCalculator #(
-        .M(M)
-    ) input_current_calculator_inst (
-        //.clk(clk),
-        //.reset(reset),
-        //.enable(enable),
+    InputCurrentCalculator input_current_calculator_inst (
         .input_spikes(input_spikes),
         .weights(weights),
         .input_current(input_current)
