@@ -6,7 +6,7 @@ module TwoLayerNetwork_debug(
     input wire [8-1:0] input_spikes,      // M1-bit input spikes for the first layer
     input wire [8*8*2-1:0] weights1,     // N1 * M1 Nbit weights for the first layer
     input wire [8*8*2-1:0] weights2,     // N2 * N1 Nbit weights for the second layer
-    input wire [8*8*2-1:0] weights3,     // N2 * N1 Nbit weights for the second layer
+    input wire [8*4*2-1:0] weights3,     // N2 * N1 Nbit weights for the second layer
     input wire [5-1:0] threshold1,           // Firing threshold for the first layer
     input wire [3-1:0] decay1,               // Decay value for the first layer
     input wire [5-1:0] refractory_period1,   // Refractory period for the first layer
@@ -20,12 +20,12 @@ module TwoLayerNetwork_debug(
     input wire [8*8-1:0] delays1,        // Delays for the first layer
     input wire [8*8*3-1:0] delay_values2,// Delay values for the second layer
     input wire [8*8-1:0] delays2,        // Delays for the second layer
-    input wire [8*8*3-1:0] delay_values3,// Delay values for the second layer
-    input wire [8*8-1:0] delays3,        // Delays for the second layer
-    output wire [(8+8+8)*5-1:0] membrane_potential_out, // add for debug
+    input wire [8*4*3-1:0] delay_values3,// Delay values for the second layer
+    input wire [8*4-1:0] delays3,        // Delays for the second layer
+    output wire [(8+8+4)*5-1:0] membrane_potential_out, // add for debug
     output wire [8-1:0] output_spikes_layer1,     // Output spike signals for the first layer
     output wire [8-1:0] output_spikes_layer2,     // Output spike signals for the second layer
-    output wire [8-1:0] output_spikes,     // Output spike signals for the second layer
+    output wire [4-1:0] output_spikes,     // Output spike signals for the second layer
     output reg output_data_ready
 );
 
@@ -100,7 +100,7 @@ module TwoLayerNetwork_debug(
     // Third layer
     NeuronLayerWithDelays_debug #(
         //.M(N1),
-        .N(8)
+        .N(4)
     ) layer3 (
         .clk(clk),
         .reset(reset),
@@ -113,7 +113,7 @@ module TwoLayerNetwork_debug(
         .refractory_period(refractory_period3),
         .delay_values(delay_values3),
         .delays(delays3),
-        .membrane_potential_out(membrane_potential_out[(8+8+8)*5-1:(8+8)*5]),
+        .membrane_potential_out(membrane_potential_out[(8+4+8)*5-1:(8+8)*5]),
         .output_spikes(output_spikes)
     );
     

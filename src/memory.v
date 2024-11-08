@@ -1,20 +1,20 @@
 module memory
 (
     input wire [7:0] data_in,//[N-1:0] data_in,
-    input wire [7:0] addr,//[$clog2(M)-1:0] addr,
+    input wire [6:0] addr,//[$clog2(M)-1:0] addr,
     input wire write_enable,
     input wire clk,
     input wire reset,
     output reg [7:0] data_out,//[N-1:0] data_out,
-    output reg [149*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
+    output reg [125*8-1:0] all_data_out//[M*N-1:0] all_data_out   (5+32+64+1)=102 bytes
 );
 
     // Declare the memory array 
-    reg [7:0] mem [0:149-1];
+    reg [7:0] mem [0:125-1];
     integer j;
     
-    reg [7:0] addr_reg_out;
-    wire [7:0] addr_reg_in;
+    reg [6:0] addr_reg_out;
+    wire [6:0] addr_reg_in;
     
     assign addr_reg_in = addr;
 
@@ -150,30 +150,30 @@ module memory
             mem[122] <= 0;
             mem[123] <= 0;
             mem[124] <= 0;
-            mem[125] <= 0;
-            mem[126] <= 0;
-            mem[127] <= 0;
-            mem[128] <= 0;
-            mem[129] <= 0;
-            mem[130] <= 0;
-            mem[131] <= 0;
-            mem[132] <= 0;
-            mem[133] <= 0;
-            mem[134] <= 0;
-            mem[135] <= 0;
-            mem[136] <= 0;
-            mem[137] <= 0;
-            mem[138] <= 0;
-            mem[139] <= 0;
-            mem[140] <= 0;
-            mem[141] <= 0;
-            mem[142] <= 0;
-            mem[143] <= 0;
-            mem[144] <= 0;
-            mem[145] <= 0;
-            mem[146] <= 0;
-            mem[147] <= 0;
-            mem[148] <= 0;
+//            mem[125] <= 0;
+//            mem[126] <= 0;
+//            mem[127] <= 0;
+//            mem[128] <= 0;
+//            mem[129] <= 0;
+//            mem[130] <= 0;
+//            mem[131] <= 0;
+//            mem[132] <= 0;
+//            mem[133] <= 0;
+//            mem[134] <= 0;
+//            mem[135] <= 0;
+//            mem[136] <= 0;
+//            mem[137] <= 0;
+//            mem[138] <= 0;
+//            mem[139] <= 0;
+//            mem[140] <= 0;
+//            mem[141] <= 0;
+//            mem[142] <= 0;
+//            mem[143] <= 0;
+//            mem[144] <= 0;
+//            mem[145] <= 0;
+//            mem[146] <= 0;
+//            mem[147] <= 0;
+//            mem[148] <= 0;
             
         end else if (write_enable) begin
             mem[addr_reg_in] <= data_in;  // Write data to memory
@@ -186,7 +186,7 @@ module memory
         data_out = mem[addr_reg_out];
 
         // Concatenate all memory data into all_data_out
-        for (j = 0; j < 149; j = j + 1) begin
+        for (j = 0; j < 125; j = j + 1) begin
             all_data_out[j*8 +: 8] = mem[j];
         end
     end
