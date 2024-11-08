@@ -25,7 +25,7 @@ module debug_module(
     // Multiplexer to select the Nbits signal based on debug_config
     always @*
         case (debug_config)
-            8'b00000000: debug_output =  {3'b000, membrane_potentials[5-1:0]};
+            8'b00100000: debug_output =  {3'b000, membrane_potentials[5-1:0]};
             8'b00000001: debug_output =  {3'b000, membrane_potentials[2*5-1:5]};
             8'b00000010: debug_output = {3'b000, membrane_potentials[3*5-1:2*5]};
             8'b00000011: debug_output = {3'b000, membrane_potentials[4*5-1:3*5]};
@@ -43,15 +43,9 @@ module debug_module(
             8'b00001111: debug_output = {3'b000, membrane_potentials[16*5-1:15*5]};
             8'b00010000: debug_output = {3'b000, membrane_potentials[17*5-1:16*5]};
             8'b00010001: debug_output = {3'b000, membrane_potentials[18*5-1:17*5]};
-            8'b00010010: debug_output = {3'b000, membrane_potentials[19*5-1:18*5]};
-            8'b00010011: debug_output = {3'b000, membrane_potentials[20*5-1:19*5]};
-            8'b00010100: debug_output = {3'b000, membrane_potentials[21*5-1:20*5]};
-            8'b00010101: debug_output = {3'b000, membrane_potentials[22*5-1:21*5]};
-            8'b00010110: debug_output = {3'b000, membrane_potentials[23*5-1:22*5]};
-            8'b00010111: debug_output = {3'b000, membrane_potentials[24*5-1:23*5]};
             8'b00011110: debug_output = output_spikes_layer1;
-            8'b00011111: debug_output = output_spikes_layer2;
-            default: debug_output = output_spikes_layer3;
+            8'b00011111: debug_output = output_spikes_layer3;
+            default: debug_output = output_spikes_layer2;
         endcase
 
 
