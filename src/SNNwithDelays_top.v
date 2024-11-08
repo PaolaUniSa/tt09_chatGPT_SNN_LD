@@ -38,7 +38,6 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
     endgenerate
 
     TwoLayerNetwork_debug #(
-        .M1(8), 
         .N1(8), 
         .N2(8)
     ) two_layer_network_inst (
