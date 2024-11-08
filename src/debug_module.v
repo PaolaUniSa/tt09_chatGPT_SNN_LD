@@ -3,7 +3,7 @@ module debug_module(
     input wire rst,    // Active high reset
     input wire en,     // Enable signal
     input wire [7:0] debug_config_in,
-    input wire [(8+8+8)*5-1:0] membrane_potentials, // Flattened array
+    input wire [(8+8+2)*5-1:0] membrane_potentials, // Flattened array
     input wire [8-1:0] output_spikes_layer1,
     input wire [8-1:0] output_spikes_layer2,
     input wire [8-1:0] output_spikes_layer3,
