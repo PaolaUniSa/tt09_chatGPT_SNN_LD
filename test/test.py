@@ -5,14 +5,130 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
+async def apply_reset(dut, num_cycles=2):
+    """Applies reset for a specified number of clock cycles."""
+    dut._log.info("Applying reset")
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, num_cycles)
+    dut.rst_n.value = 1
+    dut._log.info("Reset released")
+
+async def send_byte(dut, byte):
+    """Sends a byte over MOSI, simulating the SPI behavior."""
+    #dut._log.info(f"Sending byte: {byte:02X}")
+    await ClockCycles(dut.clk, 40)
+    await ClockCycles(dut.clk, 10) #1/4 serial_clk_period
+    dut.uio_in[0].value = 0  # SS = 0, activate
+    for i in range(8):
+        dut.uio_in[1].value = (byte >> (7 - i)) & 1  # Set MOSI bit
+        await ClockCycles(dut.clk, 40)
+    dut.uio_in[0].value = 1  # SS = 1, deactivate
+    await ClockCycles(dut.clk, 10)#1/4 serial_clk_period
+    await ClockCycles(dut.clk, 20)#1/2 serial_clk_period
+
+async def wait_cycles(dut, num_cycles):
+    """Waits for a specified number of clock cycles."""
+    #dut._log.info(f"Waiting for {num_cycles} serial cycles")
+    await ClockCycles(dut.clk, num_cycles*40)
+
+async def execute_instr(dut, address_msb, address_lsb, instruction, data_byte):
+    """Executes an instruction by sending a sequence of bytes."""
+    await send_byte(dut, address_msb)
+    await wait_cycles(dut, 2)
+    await send_byte(dut, address_lsb)
+    await wait_cycles(dut, 2)
+    await send_byte(dut, instruction)
+    await wait_cycles(dut, 2)
+    await send_byte(dut, data_byte)
+    await wait_cycles(dut, 2)
+
+async def write_input_spikes(dut, input_spikes):
+    """Writes a 8-bit input spike data to the memory."""
+    byte = input_spikes
+    await execute_instr(dut, 0x00, 0x00, 0x07, byte)
+    await wait_cycles(dut, 1)
+
+async def write_parameters(dut, decay, refractory_period, threshold, div_value, delays, debug_config_in):
+    """Writes network parameters to the memory."""
+    await execute_instr(dut, 0x00, 0x01, 0x01, decay)
+    await wait_cycles(dut, 1)
+    await execute_instr(dut, 0x00, 0x02, 0x01, refractory_period)
+    await wait_cycles(dut, 1)
+    await execute_instr(dut, 0x00, 0x03, 0x01, threshold)
+    await wait_cycles(dut, 1)
+    await execute_instr(dut, 0x00, 0x04, 0x05, div_value)
+    await wait_cycles(dut, 1)
+
+    for i in range(37, 101): #escluso 101
+        await execute_instr(dut, 0x00, i, 0x07, delays)
+        await wait_cycles(dut, 1)
+
+    await execute_instr(dut, 0x00, 0x65, 0x09, debug_config_in)
+    await wait_cycles(dut, 1)
+
+async def write_weights(dut, weight): #escluso 37
+    """Writes weight values to memory addresses from 0x07 to 0x3A."""
+    weight_byte = (weight << 6) | (weight << 4) | (weight << 2) | weight
+    for i in range(5, 37):
+        await execute_instr(dut, 0x00, i, 0x01, weight_byte)
+        await wait_cycles(dut, 1)
+
+
+
+
 
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
+    
+    #Inizialization
+    dut._log.info("Initialization")
+    dut.ena.value = 1
+    dut.ui_in.value = 0 # input_ready=ui_in[0] 
+    dut.uio_in.value = 0 #MOSI= uio_in[1]
+    dut.uio_in[0].value = 1 #SS
+    
+    # Set the clock periods for system and SPI clocks
+    serial_clock_period = 1000  # 1 MHz
+    system_clock_period = serial_clock_period/40  # 40 MHz
 
     # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
+    #clock = Clock(dut.clk, 10, units="us")
+    #cocotb.start_soon(clock.start())
+
+    # Initialize clocks
+    system_clock = Clock(dut.clk, system_clock_period, units="ns")
+    cocotb.start_soon(system_clock.start())
+
+    serial_clock = Clock(dut.uio_in[3], serial_clock_period, units="ns")
+    cocotb.start_soon(serial_clock.start())
+
+    await ClockCycles(dut.clk, 1)
+    
+
+    # Apply reset
+    dut._log.info("Reset")
+    await apply_reset(dut)
+    
+    await ClockCycles(dut.clk, 100)
+    
+    #startup mode
+    dut._log.info("Writing parameters...")
+    await write_parameters(dut,0x01,0x01,0x05,0x01,0x01,0xFF) #decay,refractory_period,threshold,div_value,delays,debug_config_in);
+    dut._log.info("Writing weights...")
+    await write_weights(dut,0)
+    dut._log.info("Writing input spikes...")
+    await write_input_spikes(dut,0xFF )
+    dut._log.info("input ready=1")
+    dut.ui_in[0].value = 1 #input_ready=1; 
+    dut._log.info("computation...")
+    await wait_cycles(dut, 1000)
+    
+    # dut._log.info("Send a byte")
+    # await send_byte(dut, 0x00)
+    # await wait_cycles(dut, 2)
+
+
 
     # Reset
     dut._log.info("Reset")
@@ -31,6 +147,12 @@ async def test_project(dut):
 
     # Wait for one clock cycle to see the output values
     await ClockCycles(dut.clk, 1)
+    
+    
+    #First test # Apply reset
+    await apply_reset(dut)
+    
+    await ClockCycles(dut.clk, 5)
 
     # The following assersion is just an example of how to check the output values.
     # Change it to match the actual expected output of your module:
