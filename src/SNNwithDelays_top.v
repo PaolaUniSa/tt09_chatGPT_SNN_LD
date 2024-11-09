@@ -24,7 +24,7 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
     wire [8*8-1:0] delays2;//8*2
     wire [8*2*3-1:0] delay_values3;//8*2*3=48
     wire [8*2-1:0] delays3;//8*2
-    wire [1:0] output_spikes_layer3;
+    //wire [1:0] output_spikes_layer3;
     
     genvar i;
     generate
@@ -76,10 +76,10 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
         .membrane_potential_out(membrane_potential_out),
         .output_spikes_layer1(output_spikes_layer1),
         .output_spikes_layer2(output_spikes_layer2),
-        .output_spikes(output_spikes_layer3),
+        .output_spikes(output_spikes[1:0]),
         .output_data_ready(output_data_ready)
     );
     
-    assign output_spikes={6'b0,output_spikes_layer3};
+    assign output_spikes[7:2]=6'b000000;
 
 endmodule
