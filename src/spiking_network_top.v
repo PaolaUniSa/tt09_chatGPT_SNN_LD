@@ -1,7 +1,7 @@
 module spiking_network_top 
  (
     input wire system_clock, 
-    input wire rst_n,
+    input wire rst_n, 
     input wire SCLK,
     input wire MOSI,
     input wire SS,
@@ -162,12 +162,12 @@ module spiking_network_top
     // all_data_out Assignments
     // output wire [113*8-1:0] all_data_out
     // all_data_out:
-    // decay             = 5:0 bits in the 2° byte -- addr: 0x00
-    // refractory_period = 5:0 bits in the 3° byte -- addr: 0x01
-    // threshold         = 5:0 bits in the 4° byte -- addr: 0x02
-    // div_value         = 5° byte  -- addr: 0x03
-    // weights           = (8*8+8*8+8*2)*2 = 288 bits -> 36 bytes (from 5° to 40°)  -- addr: [0x04,0x27] decimal:[4 - 39]
-    // delays            = (8*8+8*8+8*2)*4= 576 bits (72 bytes) (from 41° to 112°) -- addr: [0x28,0x6F] decimal:[40 - 111]
+    // decay             = 5:0 bits in the 2Â° byte -- addr: 0x00
+    // refractory_period = 5:0 bits in the 3Â° byte -- addr: 0x01
+    // threshold         = 5:0 bits in the 4Â° byte -- addr: 0x02
+    // div_value         = 5Â° byte  -- addr: 0x03
+    // weights           = (8*8+8*8+8*2)*2 = 288 bits -> 36 bytes (from 5Â° to 40Â°)  -- addr: [0x04,0x27] decimal:[4 - 39]
+    // delays            = (8*8+8*8+8*2)*4= 576 bits (72 bytes) (from 41Â° to 112Â°) -- addr: [0x28,0x6F] decimal:[40 - 111]
     // debug_config_in   = 8 bits in the 113 byte -- addr: 0x70 decimal:112
     
 	//assign input_spikes = all_data_out      [8-1 : 0]; deleted 5 November
