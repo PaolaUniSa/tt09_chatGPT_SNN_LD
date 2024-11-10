@@ -1,4 +1,4 @@
-module TwoLayerNetwork_debug(
+module ThreeLayerNetwork_debug(
     input wire clk,                        // Clock signal
     input wire reset,                      // Asynchronous reset, active high
     input wire enable,                     // Enable input for the entire network
