@@ -49,7 +49,7 @@ module SNNwithDelays_top //weight bit-length=2bits=(zero,sign) // membrane poten
     endgenerate
     
 
-    TwoLayerNetwork_debug two_layer_network_inst (
+    ThreeLayerNetwork_debug three_layer_network_inst (
         .clk(clk),
         .reset(reset),
         .enable(enable),
