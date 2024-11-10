@@ -28,7 +28,6 @@ After reset, program the neuron threshold, decay rate, and refractory period. Ad
 
 Each parameter (decay, refractory period, membrane potential threshold, weights, and delays) and each configuration signal ( value for the configurable clock divider and output select signal) is accessible via SPI in specific byte addresses. The memory is organized as follows:
 
-## Memory Map Table
 
 | Parameter           | Bit Range / Byte         | Address (Hex) | Address (Decimal) | Description                                         |
 |---------------------|--------------------------|---------------|-------------------|-----------------------------------------------------|
@@ -39,6 +38,8 @@ Each parameter (decay, refractory period, membrane potential threshold, weights,
 | `weights`           | 36 bytes (5th to 40th)   | 0x04 - 0x27   | 4 - 39            | Synaptic weights                                    |
 | `delays`            | 72 bytes (41st to 112th) | 0x28 - 0x6F   | 40 - 111          | Synaptic delay                                      |
 | `output_config`     | 8 bits in 113th byte     | 0x70          | 112               | Output select signal                                |
+
+###  Simulations
 
 
 ## External hardware
