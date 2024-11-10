@@ -1,7 +1,7 @@
 # Tiny Tapeout project information
 project:
   title:        "ChatGPT-generated Spiking Neural Network with Delays"      # Project title
-  author:       "Paola Vitolo"      # Your name
+  author:       "Paola Vitolo - Gian Domenico Licciardo - Andreas Andreou"      # Your name
   discord:      "paolaunisa"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "ChatGPT-generated Spiking Neural Network with Delays"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
