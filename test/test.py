@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: © 2024 Tiny Tapeout
 # SPDX-License-Identifier: Apache-2.0
-
+import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
@@ -68,9 +68,16 @@ async def write_parameters(dut, decay, refractory_period, threshold, div_value, 
     await execute_instr(dut, 0x00, 0x03, 0x05, div_value)
     await wait_serial_clock_cycles(dut, 1)
 
-    for i in range(40, 112): 
-        await execute_instr(dut, 0x00, i, 0x01, delays)
-        await wait_serial_clock_cycles(dut, 1)
+    # for i in range(40, 112): 
+        # await execute_instr(dut, 0x00, i, 0x01, delays)
+        # await wait_serial_clock_cycles(dut, 1)
+    """Writes random delays values (4 bits each) to memory addresses from (decimal)[40 - 112]"""
+    for i in range(40, 112):
+        # Generate 2 random 4-bit weights and concatenate them into an 8-bit weight byte
+        weight_byte = ((random.randint(0, 3) << 4) | random.randint(0, 3))
+        await execute_instr(dut, 0x00, i, 0x01, weight_byte)
+        await wait_serial_clock_cycles(dut, 1)   
+        
 
     await execute_instr(dut, 0x00, 0x70, 0x09, debug_config_in)
     await wait_serial_clock_cycles(dut, 1)
@@ -83,6 +90,18 @@ async def write_weights(dut, weight):
         await wait_serial_clock_cycles(dut, 1)
 
 
+async def write_random_weights(dut):
+    """Writes random weight values (2 bits each) to memory addresses from 0x04 to 0x27 (decimal: [4 - 39])"""
+    for i in range(4, 40):
+        # Generate four random 2-bit weights and concatenate them into an 8-bit weight byte
+        weight_byte = (
+            (random.randint(0, 3) << 6) |
+            (random.randint(0, 3) << 4) |
+            (random.randint(0, 3) << 2) |
+            random.randint(0, 3)
+        )
+        await execute_instr(dut, 0x00, i, 0x01, weight_byte)
+        await wait_serial_clock_cycles(dut, 1)
 
 
 
@@ -116,14 +135,21 @@ async def test_project(dut):
     dut._log.info("Reset")
     await apply_reset(dut)
     
-    await ClockCycles(dut.clk, 100)
+    await ClockCycles(dut.clk, 10)
     
     #startup mode
     dut._log.info("Startup mode...")
     dut._log.info("Writing parameters...")
-    await write_parameters(dut,0x05,0x01,0x05,0x01,0x01,0xFF) #decay,refractory_period,threshold,div_value,delays,debug_config_in);
+    await write_parameters(dut,0x05,0x01,0x07,0x01,0x01,0x81) #decay,refractory_period,threshold,div_value,delays,debug_config_in);
+    
     dut._log.info("Writing weights (set all the weights to +1)...")
     await write_weights(dut,1)
+    
+    # dut._log.info("Writing random weights...")
+    # dut.uio_in[6].value = 0 #SNN_en=0;
+    # await write_random_weights(dut)
+    # await wait_serial_clock_cycles(dut, 1)
+    
     dut._log.info("Writing input spikes (0xFF)...")
     await write_input_spikes(dut,0xFF )
     dut._log.info("SNN_en=1")
@@ -152,13 +178,67 @@ async def test_project(dut):
     await write_input_spikes(dut,0xFF )
     dut._log.info("SNN_en=1")
     dut.uio_in[6].value = 1 #SNN_en=1; 
-    await wait_serial_clock_cycles(dut, 1000)
+    dut._log.info("Computation for 8 spikes...")
+    await wait_system_clock_cycles(dut, 1)
+    dut.uio_in[6].value = 0 #SNN_en=0;
+    await wait_system_clock_cycles(dut, 1)
     
+    dut._log.info("Writing random input spikes...")
+    for i in range(2):
+        # Generate a random 8-bit input spike
+        random_spike = random.randint(0, 255)
+        dut._log.info(f"Writing input spikes ({hex(random_spike)})...")
+        await write_input_spikes(dut, random_spike)
+        
+        # Enable SNN computation
+        dut._log.info("SNN_en=1")
+        dut.uio_in[6].value = 1  # SNN_en=1; 
+        
+        # Wait for one system clock cycle to simulate computation
+        dut._log.info("Computation...")
+        await wait_system_clock_cycles(dut, 1)
+        
+        # Disable SNN computation
+        dut.uio_in[6].value = 0  # SNN_en=0; 
+
+    dut._log.info("Writing other 100000 random input spikes...")
+
+
+    dut._log.info("Writing 100000 random input spikes...")
+    for i in range(100000):
+        # Generate a random 8-bit input spike
+        random_spike = random.randint(0, 255)
+        
+        # Write input spike
+        #dut._log.info(f"Writing input spikes ({hex(random_spike)})...")
+        await write_input_spikes(dut, random_spike)
+        
+        # Enable SNN computation
+        dut.uio_in[6].value = 1  # SNN_en=1;
+        
+        # Wait for one system clock cycle to simulate computation
+        await wait_system_clock_cycles(dut, 1)
+        
+        # Disable SNN computation
+        dut.uio_in[6].value = 0  # SNN_en=0;
+        
+        # Log progress at specific percentages
+        if i == 25000:
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("25% complete...")
+        elif i == 50000:
+            dut._log.info("50% complete...")
+        elif i == 75000:
+            dut._log.info("75% complete...")
+        elif i == 90000:
+            dut._log.info("90% complete...")
+        elif i == 99999:  # i reaches 100000 at the end of the loop (0-indexed)
+            dut._log.info("100% complete...")
+
+        
     # dut._log.info("Send a byte")
     # await send_byte(dut, 0x00)
     # await wait_serial_clock_cycles(dut, 2)
-
-
 
     # # Reset
     # dut._log.info("Reset")
