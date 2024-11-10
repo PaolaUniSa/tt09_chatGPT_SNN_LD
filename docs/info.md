@@ -8,7 +8,7 @@ You can also include images in this folder and reference them in the markdown. E
 -->
 ## Overview
 
-<img src="https://github.com/user-attachments/assets/2a59dda5-e970-48e8-8068-39cb6dc95023" width="900" align="center">
+<img src="https://github.com/user-attachments/assets/a8edfa5e-094c-435f-b5c9-1568dd23c896" width="900" align="center">
 
 
 ## How it works
@@ -40,6 +40,20 @@ Each parameter (decay, refractory period, membrane potential threshold, weights,
 | `output_config`     | 8 bits in 113th byte     | 0x70          | 112               | Output select signal                                |
 
 ###  Simulations
+
+#### Post-Synthesis Simulation
+<img src="https://github.com/user-attachments/assets/ad4a4871-eca8-4dc8-8d97-39cda3c1b4d2" width="900" align="center">
+
+#### RTL Simulations
+##### Top level view
+<img src="https://github.com/user-attachments/assets/32c0e1ee-fc1c-42cd-9764-0472050d2438" width="900" align="center">
+
+##### Startup: loading of all the parameters and configuration signals
+<img src="https://github.com/user-attachments/assets/94c8cb7f-a6d1-4421-a572-bc6a93445f10" width="900" align="center">
+
+##### Run Mode
+<img src="https://github.com/user-attachments/assets/ca92bd9e-4b70-4b37-b48c-ac1d263800cf" width="900" align="center">
+
 
 
 ## External hardware
