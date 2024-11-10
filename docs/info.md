@@ -55,7 +55,5 @@ Each parameter (decay, refractory period, membrane potential threshold, weights,
 <img src="https://github.com/user-attachments/assets/ca92bd9e-4b70-4b37-b48c-ac1d263800cf" width="900" align="center">
 
 
-
-## External hardware
-
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+## Acknowledgment
+This work was supported by NSF Grant 2020624 AccelNet:Accelerating Research on Neuromorphic Perception, Action, and Cognition through the Telluride Workshop on Neuromorphic Cognition Engineering, NSF Grant 2332166 RCN-SC: Research Coordination Network for Neuromorphic Integrated Circuits and NSF Grant 2223725 EFRI BRAID: Using Proto-Object Based Saliency Inspired By Cortical Local Circuits to Limit the Hypothesis Space for Deep Learning Models.
