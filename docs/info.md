@@ -8,7 +8,7 @@ You can also include images in this folder and reference them in the markdown. E
 -->
 ## Overview
 
-<img src="https://github.com/user-attachments/assets/a8edfa5e-094c-435f-b5c9-1568dd23c896" width="900" align="center">
+<img src="https://github.com/user-attachments/assets/ffac9993-df82-4ce7-a02e-0ea15e5eb8e8" width="900" align="center">
 
 
 ## How it works
@@ -53,6 +53,9 @@ Each parameter (decay, refractory period, membrane potential threshold, weights,
 
 ##### Run Mode
 <img src="https://github.com/user-attachments/assets/ca92bd9e-4b70-4b37-b48c-ac1d263800cf" width="900" align="center">
+
+<img src="https://github.com/user-attachments/assets/54750e11-fc4f-4040-87de-cc8372e8ea4a" width="900" align="center">
+
 
 
 ## Acknowledgment
