@@ -39,55 +39,70 @@ async def wait_system_clock_cycles(dut, num_cycles):
 async def execute_instr(dut, address_msb, address_lsb, instruction, data_byte):
     """Executes an instruction by sending a sequence of bytes."""
     await send_byte(dut, address_msb)
-    await wait_serial_clock_cycles(dut, 2)
+    #await wait_serial_clock_cycles(dut, 1)
     await send_byte(dut, address_lsb)
-    await wait_serial_clock_cycles(dut, 2)
+    #await wait_serial_clock_cycles(dut, 1)
     await send_byte(dut, instruction)
-    await wait_serial_clock_cycles(dut, 2)
+    #await wait_serial_clock_cycles(dut, 1)
     await send_byte(dut, data_byte)
-    await wait_serial_clock_cycles(dut, 2)
+    #await wait_serial_clock_cycles(dut, 1)
 
 async def write_input_spikes(dut, input_spikes):
     """Writes a 8-bit input spike data to the memory."""
     byte = input_spikes
     dut.ui_in.value = input_spikes
-    await wait_system_clock_cycles(dut, 1)
+    await wait_system_clock_cycles(dut, 2)
     dut.uio_in[4].value = 1 #input_ready=1
-    await wait_system_clock_cycles(dut, 1)
+    await wait_system_clock_cycles(dut, 2)
     dut.uio_in[4].value = 0 #input_ready=0
-    await wait_system_clock_cycles(dut, 1)
+    await wait_system_clock_cycles(dut, 2)
 
-async def write_parameters(dut, decay, refractory_period, threshold, div_value, delays, debug_config_in):
+
+
+
+# // all_data_out Assignments
+# // output wire [113*8-1:0] all_data_out
+# // all_data_out:
+# // decay             = 5:0 bits in the 2° byte -- addr: 0x00
+# // refractory_period = 5:0 bits in the 3° byte -- addr: 0x01
+# // threshold         = 5:0 bits in the 4° byte -- addr: 0x02
+# // div_value         = 5° byte  -- addr: 0x03
+# // weights           = (8*8+8*8+8*2)*2 = 288 bits -> 36 bytes (from 5° to 40°)  -- addr: [0x04,0x27] decimal:[4 - 39]
+# // delays            = (8*8+8*8+8*2)*4= 576 bits (72 bytes) (from 41° to 112°) -- addr: [0x28,0x6F] decimal:[40 - 111]
+# // debug_config_in   = 8 bits in the 113 byte -- addr: 0x70 decimal:112
+async def write_parameters(dut, decay, refractory_period, threshold, div_value, delays, debug_config_in,random_delays):
     """Writes network parameters to the memory."""
     await execute_instr(dut, 0x00, 0x00, 0x01, decay)
-    await wait_serial_clock_cycles(dut, 1)
+    #await wait_serial_clock_cycles(dut, 1)
     await execute_instr(dut, 0x00, 0x01, 0x01, refractory_period)
-    await wait_serial_clock_cycles(dut, 1)
+    #await wait_serial_clock_cycles(dut, 1)
     await execute_instr(dut, 0x00, 0x02, 0x01, threshold)
-    await wait_serial_clock_cycles(dut, 1)
+    #await wait_serial_clock_cycles(dut, 1)
     await execute_instr(dut, 0x00, 0x03, 0x05, div_value)
-    await wait_serial_clock_cycles(dut, 1)
-
-    # for i in range(40, 112): 
-        # await execute_instr(dut, 0x00, i, 0x01, delays)
-        # await wait_serial_clock_cycles(dut, 1)
-    """Writes random delays values (4 bits each) to memory addresses from (decimal)[40 - 112]"""
-    for i in range(40, 112):
-        # Generate 2 random 4-bit weights and concatenate them into an 8-bit weight byte
-        weight_byte = ((random.randint(0, 3) << 4) | random.randint(0, 3))
-        await execute_instr(dut, 0x00, i, 0x01, weight_byte)
-        await wait_serial_clock_cycles(dut, 1)   
+    #await wait_serial_clock_cycles(dut, 1)
+    
+    if not random_delays: 
+        for i in range(40, 112): 
+            await execute_instr(dut, 0x00, i, 0x01, delays)
+            await wait_serial_clock_cycles(dut, 1)
+    else:
+        """Writes random delays values (4 bits each) to memory addresses from (decimal)[40 - 111]"""
+        for i in range(40, 112):
+            # Generate 2 random 4-bit weights and concatenate them into an 8-bit weight byte
+            weight_byte = ((random.randint(0, 15) << 4) | random.randint(0, 15))
+            await execute_instr(dut, 0x00, i, 0x01, weight_byte)
+            #await wait_serial_clock_cycles(dut, 1)   
         
 
     await execute_instr(dut, 0x00, 0x70, 0x09, debug_config_in)
-    await wait_serial_clock_cycles(dut, 1)
+    #await wait_serial_clock_cycles(dut, 1)
 
 async def write_weights(dut, weight):
     """Writes weight values to memory addresses from 0x04 to 0x27 (decimal:[4 - 39])"""
     weight_byte = (weight << 6) | (weight << 4) | (weight << 2) | weight
-    for i in range(4, 39):
+    for i in range(4, 40):
         await execute_instr(dut, 0x00, i, 0x01, weight_byte)
-        await wait_serial_clock_cycles(dut, 1)
+        #await wait_serial_clock_cycles(dut, 1)
 
 
 async def write_random_weights(dut):
@@ -104,6 +119,100 @@ async def write_random_weights(dut):
         await wait_serial_clock_cycles(dut, 1)
 
 
+
+async def random_input_spikes_writing_and_process(dut, num_times):
+    """Writes a random 8-bit input spike data to the memory and process it."""
+    dut.uio_in[4].value = 0 #input_ready=0
+    dut.uio_in[6].value = 0  # SNN_en=0;
+    
+    for i in range(num_times): 
+        #New Input
+        # Generate a random 8-bit input spike
+        random_spike = random.randint(0, 255)
+        dut.ui_in.value = random_spike
+        dut.uio_in[4].value = 1 #input_ready=1
+        dut.uio_in[6].value = 0  # SNN_en=0;
+        
+        await wait_system_clock_cycles(dut, 1)
+        dut.uio_in[4].value = 0 #input_ready=0
+        dut.uio_in[6].value = 0  # SNN_en=0;
+        await wait_system_clock_cycles(dut, 1)
+        
+        # Enable SNN computation
+        dut.uio_in[4].value = 0 #input_ready=0
+        dut.uio_in[6].value = 1  # SNN_en=1;
+        
+        
+        await wait_system_clock_cycles(dut, 1)
+        
+        # Log progress at specific percentages
+        if i == int(0.25*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("25% complete...")
+        elif i == int(0.5*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("50% complete...")
+        elif i == int(0.75*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("75% complete...")
+        elif i == int(0.9*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("90% complete...")
+        elif i == int(num_times-1):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("100% complete...")
+
+    dut.uio_in[4].value = 0 #input_ready=0
+    dut.uio_in[6].value = 0  # SNN_en=0;
+
+
+
+
+async def running_mode_random_input_spikes(dut, num_times):
+    """Writes a random 8-bit input spike data to the memory and process it."""
+    # Generate a random 8-bit input spike
+    dut._log.info("Writing random input spikes...")
+    random_spike = random.randint(0, 255)
+    dut.ui_in.value = random_spike
+    
+    dut.uio_in[4].value = 1 #input_ready=1
+    
+    dut._log.info("Input_ready asserted...")
+    await wait_system_clock_cycles(dut, 2)
+    
+    dut._log.info("SNN_en asserted...")
+    dut.uio_in[6].value = 1  # SNN_en=1
+    
+    await wait_system_clock_cycles(dut, 1)
+    
+    dut._log.info("Writing a new random input spike on each clock cycle...")
+    for i in range(num_times): 
+        #New Input
+        # Generate a random 8-bit input spike
+        random_spike = random.randint(0, 255)
+        dut.ui_in.value = random_spike
+        
+        await wait_system_clock_cycles(dut, 1)
+        
+        # Log progress at specific percentages
+        if i == int(0.25*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("25% complete...")
+        elif i == int(0.5*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("50% complete...")
+        elif i == int(0.75*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("75% complete...")
+        elif i == int(0.9*num_times):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("90% complete...")
+        elif i == int(num_times-1):
+            dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
+            dut._log.info("100% complete...")
+
+    dut.uio_in[4].value = 0 #input_ready=0
+    dut.uio_in[6].value = 0  # SNN_en=0;
 
 @cocotb.test()
 async def test_project(dut):
@@ -140,7 +249,7 @@ async def test_project(dut):
     #startup mode
     dut._log.info("Startup mode...")
     dut._log.info("Writing parameters...")
-    await write_parameters(dut,0x05,0x01,0x07,0x01,0x01,0x81) #decay,refractory_period,threshold,div_value,delays,debug_config_in);
+    await write_parameters(dut,0x05,0x01,0x07,0x01,0x99,0x81,1) #decay,refractory_period,threshold,div_value,delays,debug_config_in,random_delays);
     
     dut._log.info("Writing weights (set all the weights to +1)...")
     await write_weights(dut,1)
@@ -150,29 +259,18 @@ async def test_project(dut):
     # await write_random_weights(dut)
     # await wait_serial_clock_cycles(dut, 1)
     
-    dut._log.info("Writing input spikes (0xFF)...")
-    await write_input_spikes(dut,0xFF )
-    dut._log.info("SNN_en=1")
-    dut.uio_in[6].value = 1 #SNN_en=1; 
-    dut._log.info("Computation for 8 spikes...")
-    await wait_system_clock_cycles(dut, 1)
-    dut.uio_in[6].value = 0 #SNN_en=0;
-   
-    dut._log.info("Writing input spikes (0xAB)...")
-    await write_input_spikes(dut,0xAB )
-    dut._log.info("SNN_en=1")
-    dut.uio_in[6].value = 1 #SNN_en=1; 
-    dut._log.info("Computation for 8 spikes...")
-    await wait_system_clock_cycles(dut, 1)
-    dut.uio_in[6].value = 0 #SNN_en=0;   
+    await ClockCycles(dut.clk, 100)
     
-    dut._log.info("Writing input spikes (0x75)...")
-    await write_input_spikes(dut,0x75 )
-    dut._log.info("SNN_en=1")
-    dut.uio_in[6].value = 1 #SNN_en=1; 
-    dut._log.info("Computation for 8 spikes...")
-    await wait_system_clock_cycles(dut, 1)
-    dut.uio_in[6].value = 0 #SNN_en=0;   
+    dut._log.info("Run Mode with 2000 random input spikes...")
+    await running_mode_random_input_spikes(dut, 2000)
+    
+    await ClockCycles(dut.clk, 1000)
+        
+        
+    dut._log.info("Writing and process 100 random input spikes...")
+    await random_input_spikes_writing_and_process(dut, 100)
+    
+    await ClockCycles(dut.clk, 10)
     
     dut._log.info("Writing input spikes (0xFF)...")
     await write_input_spikes(dut,0xFF )
@@ -181,7 +279,7 @@ async def test_project(dut):
     dut._log.info("Computation for 8 spikes...")
     await wait_system_clock_cycles(dut, 1)
     dut.uio_in[6].value = 0 #SNN_en=0;
-    await wait_system_clock_cycles(dut, 1)
+ 
     
     dut._log.info("Writing random input spikes...")
     for i in range(2):
@@ -199,16 +297,15 @@ async def test_project(dut):
         await wait_system_clock_cycles(dut, 1)
         
         # Disable SNN computation
-        dut.uio_in[6].value = 0  # SNN_en=0; 
-
-    dut._log.info("Writing other 100000 random input spikes...")
+        dut.uio_in[6].value = 0  # SNN_en=0;
 
 
-    dut._log.info("Writing 100000 random input spikes...")
-    for i in range(100000):
+    dut._log.info("Writing and process 10000 random input spikes...")
+    num_times=10000
+    for i in range(10000):
         # Generate a random 8-bit input spike
         random_spike = random.randint(0, 255)
-        
+        await wait_system_clock_cycles(dut, 1)
         # Write input spike
         #dut._log.info(f"Writing input spikes ({hex(random_spike)})...")
         await write_input_spikes(dut, random_spike)
@@ -223,17 +320,20 @@ async def test_project(dut):
         dut.uio_in[6].value = 0  # SNN_en=0;
         
         # Log progress at specific percentages
-        if i == 25000:
+        if i == int(0.25*num_times):
             dut._log.info(f"Input spikes ({hex(random_spike)}) written at this step...")
             dut._log.info("25% complete...")
-        elif i == 50000:
+        elif i == int(0.25*num_times):
             dut._log.info("50% complete...")
-        elif i == 75000:
+        elif i == int(0.25*num_times):
             dut._log.info("75% complete...")
-        elif i == 90000:
+        elif i == int(0.25*num_times):
             dut._log.info("90% complete...")
-        elif i == 99999:  # i reaches 100000 at the end of the loop (0-indexed)
+        elif i == int(0.25*num_times):  # i reaches 100000 at the end of the loop (0-indexed)
             dut._log.info("100% complete...")
+
+    dut._log.info("Writing and process 50000 random input spikes...")
+    await random_input_spikes_writing_and_process(dut, 50000)
 
         
     # dut._log.info("Send a byte")
